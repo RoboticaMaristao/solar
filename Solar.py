@@ -7,12 +7,13 @@ fps = 60
 sSpeed =2 #shoot speed
 speed = 1.2
 
-# Define some colors
+# Define colors
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 PINK = (255, 0, 255)
 
+#dimensions
 WORLD_WIDTH = 5000
 WORLD_HEIGHT = 5000
 SCREEN_WIDTH = 700
@@ -21,7 +22,9 @@ SCREEN_HEIGHT = 500
 size = [SCREEN_WIDTH, SCREEN_HEIGHT]
 screen = pygame.display.set_mode(size)
 
+#Bool to change between menu and gameplay
 menu = True
+
 
 class GameObject(pygame.Rect):
     allObj = []
@@ -97,7 +100,7 @@ class Ship(Enemy):
         self.coolDown = fps*2
 
     def shoot(self):
-       Bullet(self.ang, self, 1, self.xf,self.yf,5,5)
+       Bullet(self.ang, self, 1.6, self.xf,self.yf,5,5)
 
     def update(self):
         super().update()
@@ -140,7 +143,7 @@ class MachineGun(Enemy):
         self.coolDown = fps*0.3
 
     def shoot(self):
-       b =Bullet(self.ang+math.radians(random.randint(-30,30)), self, 0.7,  self.xf,self.yf,15,15)
+       b =Bullet(self.ang+math.radians(random.randint(-30,30)), self, 1.3,  self.xf,self.yf,15,15)
 
 
     def update(self):
@@ -207,11 +210,12 @@ class Bullet(GameObject):
         self.hp = 3
         self.vx = sSpeed*math.cos(angle)*sp + owner.vx
         self.vy = -sSpeed*math.sin(angle)*sp + owner.vy
-        
         Bullet.allB.append(self)
+
     def destroy(self):
         Bullet.allB.remove(self)
         super().destroy()
+
     def update(self):
         self.xf += self.vx
         self.yf += self.vy
@@ -249,11 +253,14 @@ class Player(GameObject):
                     g.draw((int(g.xf - self.xf + w), int(g.yf - self.yf + h)))
     def destroy(self):
         print('died')
-        global menu
-        self.hp = 10 
-        for g in Enemy.allEnemies:
-            g.destroy()
+        global menu 
         menu = True
+        GameObject.allObj.clear()
+        global player
+        player = Player((0,0,30,30))
+
+
+
     def boost(self):
         self.vx+=acel*math.cos(self.ang)
         self.vy-=acel*math.sin(self.ang)
@@ -281,7 +288,6 @@ def spawnEnemy():
         MachineGun(position)
 
 def main():
-
     pygame.init()
     
     pygame.display.set_caption("Balanced as everything should be")
@@ -300,7 +306,7 @@ def main():
             screen.fill((100,0,150))
             clock.tick(fps)
             font = pygame.font.SysFont("comicsansms", 72)
-            text = font.render("Press Space", True, (0, 128, 0))
+            text = font.render("Press Enter", True, (0, 128, 0))
             screen.blit(text,(280 - text.get_width() // 2, 240 - text.get_height() // 2))
 
             pygame.display.flip()
@@ -309,7 +315,7 @@ def main():
                 if event.type == pygame.QUIT:
                     done = True
                 elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_SPACE:
+                    if event.key == pygame.K_RETURN:
                         menu = False
         else:
             # --- Event Processing
@@ -350,8 +356,6 @@ def main():
             # pygame.draw.line(screen, (100,0,20), (w, h), (int(w+math.cos(player.ang)*20.0), int(h-math.sin(player.ang)*20)), 2)
             player.move()     
 
-            for b in Bullet.allB:
-                b.update()
 
             # Set the screen background
     
